@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/normalize.css" />
+  <link rel="stylesheet" type="text/css" href="/stylesheets/foundation.css" />
+  <script src="/javascripts/jquery.min.js"></script>
+  <script src="/javascripts/foundation.js"></script>
+  <script src="/javascripts/modernizr.js"></script>
+  <script src="/javascripts/Chart.min.js"></script>
+</head>
+
+<body>
+  <script>
+      $(document).foundation();
+  </script>
+
+  <nav class="top-bar foundation-bar" data-topbar>
+  <ul class="title-area">
+    <li class="name">
+      <h1><a href="#">Rental Statistics for various cities in Bay Area.</a></h1>
+    </li>
+  </ul>
+  </nav>
+
+  <div class="row">
+
+  <div class="large-3 push-3 columns">
+  <div id="rent_chart">
+  </div>
+  </div>
+
+  <div class="large-5 pull-9 columns">
+  <p class="panel">
+  <% for (var i=0; i<cities.length; i++) { %>
+  <a class="button round tiny" href="<%= cities[i] %>" hcity="<%= cities[i] %>" id="city_btn"><%= cities[i] %></a> 
+  <% } %>
+  </p>
+  </div>
+
+
+
+  </div>
+
+
+  <script>
+  // Get context with jQuery - using jQuery's .get() method.
+  var url_parts = $(location).attr('href').split("/");
+  var city = url_parts[url_parts.length-1];
+
+  $.getJSON("/rent_chart_data/" + city, function(rent_data) {
+
+    $("#rent_chart").remove("#chart_canvas");
+    $("#rent_chart").append("<canvas id='chart_canvas' width=800 height=800></canvas>");
+    var ctx = $("#chart_canvas").get(0).getContext("2d");
+
+    var data = {labels:[], datasets:[]};
+    var dataset = { 
+                data: rent_data,
+                strokeColor: "#CC3300",
+                fillColor: "#CCA300"
+              };
+    data.datasets.push(dataset);
+    for (bd = 0; bd < 4; bd++) {
+      data.labels.push("" + (bd+1))
+    }
+    
+    var barchart = new Chart(ctx).Bar(data, {
+        barShowStroke: true,
+        scaleOverride: true,
+        scaleStartValue: 0,
+        scaleStepWidth: 300,
+        scaleSteps:35
+    });
+  });
+
+  $('.button').click(function() {
+    $("#rent_chart").remove("#chart_canvas");
+    $("#rent_chart").append("<canvas id='chart_canvas' width=800 height=800></canvas>");
+    var ctx = $("#chart_canvas").getContext("2d");
+    var city = $(this).attr("hcity");
+    $.getJSON("/rent_chart_data/" + city, function(rent_data) {
+      var data = {labels:[], datasets:[]};
+      var dataset = { 
+                  data: rent_data,
+                  strokeColor: "#CC3300",
+                  fillColor: "#CCA300"
+                };
+      data.datasets.push(dataset);
+      for (bd = 0; bd < 4; bd++) {
+        data.labels.push("" + (bd+1))
+      }
+    });
+  });
+  </script>
+
+</body>
+</html>
