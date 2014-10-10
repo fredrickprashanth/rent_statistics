@@ -7,7 +7,7 @@
   <link rel="stylesheet" type="text/css" href="/stylesheets/normalize.css" />
   <link rel="stylesheet" type="text/css" href="/stylesheets/foundation.css" />
   <script src="/javascripts/jquery.min.js"></script>
-  <script src="/javascripts/foundation.js"></script>
+  <script src="/javascripts/foundation.min.js"></script>
   <script src="/javascripts/modernizr.js"></script>
   <script src="/javascripts/Chart.min.js"></script>
 </head>
@@ -46,7 +46,6 @@
 
 
   <script>
-  // Get context with jQuery - using jQuery's .get() method.
   var url_parts = $(location).attr('href').split("/");
   var city = url_parts[url_parts.length-1];
 
@@ -56,15 +55,22 @@
     $("#rent_chart").append("<canvas id='chart_canvas' width=800 height=800></canvas>");
     var ctx = $("#chart_canvas").get(0).getContext("2d");
 
+    var means = new Array(), counts = new Array();
+    for (var i = 0; i< rent_data.length; i++) {
+        var rent_vec = rent_data[i];
+        means.push(rent_vec[0]);
+        counts.push(rent_vec[1]);
+    }
+    
     var data = {labels:[], datasets:[]};
     var dataset = { 
-                data: rent_data,
-                strokeColor: "#CC3300",
-                fillColor: "#CCA300"
+                data: means,
+                fillColor: "#B9BDBD",
+                highlightFill: "#464848",
               };
     data.datasets.push(dataset);
     for (bd = 0; bd < 4; bd++) {
-      data.labels.push("" + (bd+1))
+      data.labels.push("" + (bd+1) + "[" + counts[bd] + "]");
     }
     
     var barchart = new Chart(ctx).Bar(data, {
