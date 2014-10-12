@@ -1,0 +1,9 @@
+/etc/systemd/system/collect_cgl_db.service
+[Unit]
+Description=collect cgldb daily
+
+[Service]
+Nice=19
+IOSchedulingClass=2
+IOSchedulingPriority=7
+ExecStart=/home/fjohnber/rent_statistics.git/parse_cgl_rss.py

@@ -44,7 +44,7 @@ def parse_cgl_apa_title(title):
 
 	place = match.group(1)
 	if "/" in place:
-		place = place.split(" / ")[0]
+		place = place.split("/")[0]
 
 	place = place.strip().lower()
 
@@ -73,8 +73,13 @@ def parse_cgl_apa_entry(entry):
 
 	#'link':'http://sfbay.craigslist.org/sfc/apa/4650586050.html',
 	link = entry["link"]
-	place_code = link.split('/')[3]
-	post_id = link.split('/')[5].split('.')[0]
+	print("Link: " + link)
+	link_split = link.split('/');
+	if len(link_split) > 5:
+		place_code = link_split[3]
+		post_id = link_split[5].split('.')[0]
+	else:
+		post_id = None
 	if not post_id:
 		return None
 	pub_date = entry["published"]
@@ -154,15 +159,16 @@ def cal_cgl_stats():
 	places = sorted(places)
 	for place in places:
 		pipeline.rpush("cities", place)
-		print("push place " + place)
 	pipeline.execute()
 		
 		
 
 if __name__ == "__main__":
-	if sys.argv[1] != "stats_only":
+	if len(sys.argv) > 1 and sys.argv[1] == "stats_only":
+		cal_cgl_stats()
+	else:
 		parse_craigslist_apa()
-	cal_cgl_stats()
+		cal_cgl_stats()
 	client.close()	
 	
 	
