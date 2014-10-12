@@ -9,7 +9,8 @@
   <script src="/javascripts/jquery.min.js"></script>
   <script src="/javascripts/foundation.min.js"></script>
   <script src="/javascripts/modernizr.js"></script>
-  <script src="/javascripts/Chart.min.js"></script>
+  <script src="/javascripts/d3.min.js"></script>
+  <script src="/javascripts/rickshaw.min.js"></script>
 </head>
 
 <body>
@@ -28,14 +29,14 @@
   <div class="row">
 
   <div class="large-3 push-3 columns">
-  <div id="rent_chart">
+  <div id="rent_chart_render">
   </div>
   </div>
 
   <div class="large-5 pull-9 columns">
   <p class="panel">
   <% for (var i=0; i<cities.length; i++) { %>
-  <a class="button round tiny" href="<%= cities[i] %>" hcity="<%= cities[i] %>" id="city_btn"><%= cities[i] %></a> 
+  <a class="button round tiny" hcity="<%= cities[i] %>" id="city_btn"><%= cities[i] %></a> 
   <% } %>
   </p>
   </div>
@@ -49,55 +50,39 @@
   var url_parts = $(location).attr('href').split("/");
   var city = url_parts[url_parts.length-1];
 
+  var graph = new Rickshaw.Graph({
+            element: document.querySelector("#rent_chart_render"),
+            renderer: 'bar',
+            series: [{
+                    data: [],
+                    color: 'steelblue'
+            }]
+  });
   $.getJSON("/rent_chart_data/" + city, function(rent_data) {
 
-    $("#rent_chart").remove("#chart_canvas");
-    $("#rent_chart").append("<canvas id='chart_canvas' width=800 height=800></canvas>");
-    var ctx = $("#chart_canvas").get(0).getContext("2d");
+    var rent_series = [];
+    for (var i = 0; i<rent_data.length; i++) {
+      var rent_vec = rent_data[i]
+      rent_series.push({x:+i, y:+rent_vec[0]});
+    }
+    graph.series[0].data = rent_series;
+    graph.render();
 
-    var means = new Array(), counts = new Array();
-    for (var i = 0; i< rent_data.length; i++) {
-        var rent_vec = rent_data[i];
-        means.push(rent_vec[0]);
-        counts.push(rent_vec[1]);
-    }
-    
-    var data = {labels:[], datasets:[]};
-    var dataset = { 
-                data: means,
-                fillColor: "#B9BDBD",
-                highlightFill: "#464848",
-              };
-    data.datasets.push(dataset);
-    for (bd = 0; bd < 4; bd++) {
-      data.labels.push("" + (bd+1) + "[" + counts[bd] + "]");
-    }
-    
-    var barchart = new Chart(ctx).Bar(data, {
-        barShowStroke: true,
-        scaleOverride: true,
-        scaleStartValue: 0,
-        scaleStepWidth: 300,
-        scaleSteps:35
-    });
   });
 
   $('.button').click(function() {
-    $("#rent_chart").remove("#chart_canvas");
-    $("#rent_chart").append("<canvas id='chart_canvas' width=800 height=800></canvas>");
-    var ctx = $("#chart_canvas").getContext("2d");
     var city = $(this).attr("hcity");
+    console.log(city);
     $.getJSON("/rent_chart_data/" + city, function(rent_data) {
-      var data = {labels:[], datasets:[]};
-      var dataset = { 
-                  data: rent_data,
-                  strokeColor: "#CC3300",
-                  fillColor: "#CCA300"
-                };
-      data.datasets.push(dataset);
-      for (bd = 0; bd < 4; bd++) {
-        data.labels.push("" + (bd+1))
+      var rent_series = [];
+      for (var i = 0; i<rent_data.length; i++) {
+        var rent_vec = rent_data[i]
+        rent_series.push({x:+i, y:+rent_vec[0]});
       }
+
+      graph.series[0].data = rent_series;
+      graph.render();
+      graph.render();
     });
   });
   </script>
