@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/stylesheets/normalize.css" />
   <link rel="stylesheet" type="text/css" href="/stylesheets/foundation.css" />
+  <link rel="stylesheet" type="text/css" href="/stylesheets/rent_chart.css" />
   <script src="/javascripts/jquery.min.js"></script>
   <script src="/javascripts/foundation.min.js"></script>
   <script src="/javascripts/modernizr.js"></script>
@@ -29,7 +30,8 @@
   <div class="row">
 
   <div class="large-3 push-3 columns">
-  <div id="rent_chart_render">
+  <div id="rent_chart_render"> 
+  <svg id="rent_chart_svg"> </svg>
   </div>
   </div>
 
@@ -50,39 +52,74 @@
   var url_parts = $(location).attr('href').split("/");
   var city = url_parts[url_parts.length-1];
 
-  var graph = new Rickshaw.Graph({
-            element: document.querySelector("#rent_chart_render"),
-            renderer: 'bar',
-            series: [{
-                    data: [],
-                    color: 'steelblue'
-            }]
-  });
+  var draw_chart = function(data) {
+
+    console.log(data);
+
+    $("#rent_chart_svg").empty();
+
+    var margin = {top: 100, right: 20, bottom: 30, left: 100},
+        width = 960 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10);
+
+    var svg = d3.select("#rent_chart_svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    x.domain(data.map(function(d) { return d.bd; }));
+    y.domain([0, d3.max(data, function(d) { return d.rent; })]);
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Rent");
+
+    svg.selectAll(".bar")
+        .data(data)
+      .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.bd); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d.rent); })
+        .attr("height", function(d) { return height - y(d.rent); });
+  }
+
   $.getJSON("/rent_chart_data/" + city, function(rent_data) {
-
-    var rent_series = [];
-    for (var i = 0; i<rent_data.length; i++) {
-      var rent_vec = rent_data[i]
-      rent_series.push({x:+i, y:+rent_vec[0]});
-    }
-    graph.series[0].data = rent_series;
-    graph.render();
-
+    draw_chart(rent_data);
   });
 
   $('.button').click(function() {
     var city = $(this).attr("hcity");
     console.log(city);
     $.getJSON("/rent_chart_data/" + city, function(rent_data) {
-      var rent_series = [];
-      for (var i = 0; i<rent_data.length; i++) {
-        var rent_vec = rent_data[i]
-        rent_series.push({x:+i, y:+rent_vec[0]});
-      }
-
-      graph.series[0].data = rent_series;
-      graph.render();
-      graph.render();
+      draw_chart(rent_data);
     });
   });
   </script>
