@@ -1,0 +1,48 @@
+$left-col: 30%;
+$right-col: (100 - $left-col);
+$cities-width: 10%;
+
+.rent-bar {
+  margin: 10px 10px 10px 10px;
+  padding: 0.1rem 1.5rem 0.1rem 1rem;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #0078a0;
+  background-color: #008cba;
+  h1 {
+    color: #99CCFF;
+  }
+  flex: auto;
+}
+
+
+.cities-col {
+  width: $left-col;
+  right: ($right-col - $cities-width);
+  float: left; 
+  li {
+    list-style:none;
+    display: block;
+    margin: 4px 2px 2px 2px;
+  }
+  li.city_item {
+      background-color: #CCE6FF;
+  }
+  li.city_sel {
+      background-color: #FFFFFF;
+  }
+  a {
+    text-decoration: none;
+  }
+  a:hover {
+    color: #FFFFFF;
+  }
+}
+
+.rent-chart {
+  width: $right-col;
+  left: $left-col;
+  float: right;
+}
+

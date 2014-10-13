@@ -5,48 +5,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/stylesheets/normalize.css" />
-  <link rel="stylesheet" type="text/css" href="/stylesheets/foundation.css" />
   <link rel="stylesheet" type="text/css" href="/stylesheets/rent_chart.css" />
+  <link rel="stylesheet" type="text/css" href="/stylesheets/app.css" />
   <script src="/javascripts/jquery.min.js"></script>
-  <script src="/javascripts/foundation.min.js"></script>
   <script src="/javascripts/modernizr.js"></script>
   <script src="/javascripts/d3.min.js"></script>
   <script src="/javascripts/rickshaw.min.js"></script>
 </head>
 
 <body>
-  <script>
-      $(document).foundation();
-  </script>
 
-  <nav class="top-bar foundation-bar" data-topbar>
-  <ul class="title-area">
-    <li class="name">
-      <h1><a href="#">Rental Statistics for various cities in Bay Area.</a></h1>
-    </li>
-  </ul>
-  </nav>
-
-  <div class="row">
-
-  <div class="large-3 push-3 columns">
-  <div id="rent_chart_render"> 
-  <svg id="rent_chart_svg"> </svg>
-  </div>
+  <div class="rent-bar">
+      <h1>Rental Statistics for various cities in Bay Area.</h1>
   </div>
 
-  <div class="large-5 pull-9 columns">
-  <p class="panel">
+  <div class="rent-chart">
+    <svg id="rent_chart_svg"> </svg>
+  </div>
+
+  <div class="cities-col">
+  <ul>
   <% for (var i=0; i<cities.length; i++) { %>
-  <a class="button round tiny" hcity="<%= cities[i] %>" id="city_btn"><%= cities[i] %></a> 
+  <li class="city_item">
+  <a class="city_button" hcity="<%= cities[i] %>" id="city_btn" href="#"><%= cities[i] %></a> 
+  </li>
   <% } %>
-  </p>
+  </ul>
   </div>
-
-
-
-  </div>
-
 
   <script>
   var url_parts = $(location).attr('href').split("/");
@@ -54,7 +39,6 @@
 
   var draw_chart = function(data) {
 
-    console.log(data);
 
     $("#rent_chart_svg").empty();
 
@@ -115,8 +99,9 @@
     draw_chart(rent_data);
   });
 
-  $('.button').click(function() {
+  $('.city_button').click(function() {
     var city = $(this).attr("hcity");
+    $(this).parent().toggleClass("city_sel");
     console.log(city);
     $.getJSON("/rent_chart_data/" + city, function(rent_data) {
       draw_chart(rent_data);

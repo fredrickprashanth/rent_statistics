@@ -1,0 +1,33 @@
+.rent-bar {
+  margin: 10px 10px 10px 10px;
+  padding: 0.1rem 1.5rem 0.1rem 1rem;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #0078a0;
+  background-color: #008cba;
+  flex: auto; }
+  .rent-bar h1 {
+    color: #99CCFF; }
+
+.cities-col {
+  width: 30%;
+  right: 60%;
+  float: left; }
+  .cities-col li {
+    list-style: none;
+    display: block;
+    margin: 4px 2px 2px 2px; }
+  .cities-col li.city_item {
+    background-color: #CCE6FF; }
+  .cities-col li.city_sel {
+    background-color: #FFFFFF; }
+  .cities-col a {
+    text-decoration: none; }
+  .cities-col a:hover {
+    color: #FFFFFF; }
+
+.rent-chart {
+  width: 70%;
+  left: 30%;
+  float: right; }
